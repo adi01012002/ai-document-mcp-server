@@ -73,11 +73,11 @@ curl -X POST http://localhost:4000/chat \
 |   
 ├──mcp/
 │    ├── server.js
-|    ├── index.js  
+|    ├── index.js        # Entry  point
 |    ├── utils/
 |    │   ├── extractText.js    # PDF/OCR text extraction  
 |    │   └── openAiExtractor.js 
-|    └── .env               entry       point
+|    └── .env               
 |                            
 └──frontend/
 
