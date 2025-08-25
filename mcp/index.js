@@ -5,7 +5,7 @@ import { AIAgentMCPServer } from "./server.js"
 
 const server = new AIAgentMCPServer(
     new Server({
-        name: "ai-mcp-server",
+        name: "ai-agent-mcp-server",
         version: "1.0.0"
     }, {
         capabilities: {

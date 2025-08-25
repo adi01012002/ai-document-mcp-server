@@ -256,7 +256,7 @@ export class AIAgentMCPClient {
 
 
 
-export const client = new AIAgentMCPClient("ai-agent-server");
+export const client = new AIAgentMCPClient("ai-agent-mcp-server");
 
 async function main() {
     const app = express();
