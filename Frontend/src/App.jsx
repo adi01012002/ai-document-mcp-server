@@ -282,6 +282,8 @@ function App() {
       });
 
       const extractedData = res.data.content[0].data.extracted_fields;
+      console.log(extractedData);
+      
       setUserData(extractedData);
 
       // Instead of a separate card, push extracted object into chat messages
@@ -314,7 +316,7 @@ function App() {
       </div>
       
       <div className="chat-messages">
-        {messages.map((message, idx) => (
+        {/* {messages.map((message, idx) => (
           <div key={idx}>
             {typeof message.content === 'string' ? (
               <ChatMessage message={message} />
@@ -334,7 +336,29 @@ function App() {
               </div>
             ) : null}
           </div>
-        ))}
+        ))} */}
+
+        {messages.map((message, idx) => (
+  <div key={idx}>
+    {typeof message.content === 'string' ? (
+      <ChatMessage message={message} />
+    ) : message.content?.type === 'userData' ? (
+      <div className="chat-message bot">
+        <div className="user-data-card">
+          <h3>📌 Extracted Details</h3>
+          <ul>
+            {Object.entries(message.content.data).map(([key, value]) => (
+              <li key={key}>
+                <strong>{key.replace(/_/g, " ")}:</strong> {value || "—"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ) : null}
+  </div>
+))}
+
         {isTyping && (
           <div className="typing-indicator">
             <div className="typing-dots">

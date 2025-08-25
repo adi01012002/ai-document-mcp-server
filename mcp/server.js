@@ -105,11 +105,11 @@ export class AIAgentMCPServer {
     return chatMessage;
   }
 
-  addUploadedFileData(sessionId, fileName, rawJson, finalText) {
+  addUploadedFileData(sessionId, document_type, rawJson, finalText) {
     const session = this.initializeSession(sessionId);
   
     const fileData = {
-      fileName,
+      document_type,
       rawJson,
       finalText,
       timestamp: new Date().toISOString(),
@@ -163,19 +163,21 @@ export class AIAgentMCPServer {
         console.log("aagaya djfjjffndkkf dji f ",extractedText);
         
         const userDetails = await extractUserDetails(extractedText);
+        console.log("ye hi dekhana hia " ,userDetails);
+        
         
 
         // const prompt = `Based on the following json object:\n\n${userDetails}\n\nRead the the json and convert into single paragraph`;
-        const prompt = `Convert the following Aadhaar JSON data into a single-line paragraph in natural English:${JSON.stringify(
+        const prompt = `Convert the following given JSON data into a single-line paragraph in natural English:${JSON.stringify(
           userDetails,
           null,
           2  // 5
         )}
-        Format:
+        Format for aadhar 
         "[Full Name], son of [Father Name], residing at [Address], was born on [DOB]. Aadhaar Number: [Number]. Gender: [Gender]."`;
         const res = await this.aiModel.generateContent(prompt);
         const finalResult = res.response.candidates[0]?.content?.parts[0]?.text;
-        this.addUploadedFileData(sessionId, 'aadhaar.json', userDetails, finalResult);
+        this.addUploadedFileData(sessionId, userDetails.document_type, userDetails, finalResult);
         console.log("Final result:", finalResult);
         
         this.addToChatHistory(sessionId, "user", userDetails);

@@ -24,7 +24,7 @@ export async function extractText(fileBase64, fileType) {
             return "Error parsing PDF";
         }
     }
-   else if (fileType === 'image'|| fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg') {
+   else if (fileType === 'image'|| fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg'||fileType==="webp") {
         const processedImage = await sharp(buffer)
           .resize(2000)
           .greyscale()
