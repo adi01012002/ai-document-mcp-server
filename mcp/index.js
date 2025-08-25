@@ -2,9 +2,6 @@ import express from "express"
 import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { AIAgentMCPServer } from "./server.js"
 
-/*******************************/
-/******* Server Set Up *******/
-/*******************************/
 
 const server = new AIAgentMCPServer(
     new Server({
@@ -18,26 +15,23 @@ const server = new AIAgentMCPServer(
     })
 )
 
-/*******************************/
-/******* Endpoint Set Up *******/
-/*******************************/
 
-const app = express()
-app.use(express.json({ limit: '100mb' }))
-app.use(express.urlencoded({ extended: true, limit: '100mb' }))
+const app = express();
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
-const router = express.Router()
+const router = express.Router();
 
 // endpoint for the client to use for sending messages
 const MCP_ENDPOINT = "/mcp"
 
 // MCP endpoint handlers
 router.post(MCP_ENDPOINT, async (req, res) => {
-  console.log("mcp end point  heidncncn");  
+  console.log("mcp end point ");  
   try {
     await server.handlePostRequest(req, res);
   } catch (error) {
-    console.error("Error in POST handler:", error);   // sabse pehle mcp server post request aayi hai
+    console.error("Error in POST handler:", error);
     if (!res.headersSent) {
       res.status(500).json({
         jsonrpc: "2.0",

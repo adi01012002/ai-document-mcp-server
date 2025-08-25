@@ -14,8 +14,7 @@ export class AIAgentMCPClient {
       name: `ai-agent-client-for-${serverName}`,
       version: "1.0.0",
     }); 
-    
-    //New session created
+
     this.transport = null;
     
     this.connected = false;
@@ -140,9 +139,8 @@ export class AIAgentMCPClient {
         );
       } 
       // getTool
-      console.log("tool mila hai",tool)
       console.log(`⚙️ Calling tool: ${toolName}`);
-      if (toolName !== "chat" && Object.keys(args).length > 0) {  // Assistant
+      if (toolName !== "chat" && Object.keys(args).length > 0) { 
         console.log(`   Arguments:`, args);
       }
 
@@ -190,8 +188,8 @@ export class AIAgentMCPClient {
           sessionId: this.sessionId,
         });
 
-        if (result.success && result.content.length > 0) {  // values
-          const response = result.content[0].text;  //get
+        if (result.success && result.content.length > 0) {  
+          const response = result.content[0].text; 
           console.log(`🤖 Assistant: ${response}`);
 
           // Update local chat history if available
@@ -205,7 +203,7 @@ export class AIAgentMCPClient {
           }
 
           console.log("━".repeat(50));
-          return {  // tool mila hai
+          return {  
             response,
             toolsUsed: result.result.toolsUsed || [],
             sessionId: result.result.sessionId || this.sessionId,
@@ -222,10 +220,6 @@ export class AIAgentMCPClient {
           };
         }
       }
-
-
-
-
 
   // Get chat history
   async getChatHistory(limit = 10) {
@@ -261,9 +255,7 @@ export class AIAgentMCPClient {
 }
 
 
-// =============================
-// ✅ Entry Point - Direct to Chat    
-// =============================
+
 export const client = new AIAgentMCPClient("ai-agent-server");
 
 async function main() {

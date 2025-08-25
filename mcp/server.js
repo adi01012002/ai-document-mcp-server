@@ -38,7 +38,7 @@ export class AIAgentMCPServer {
     this.sessionId=null
 
     // Initialize AI client
-    this.initializeAI();// ai-agent-server
+    this.initializeAI();
 
     // Session management
     this.transports = {}; // sessionId -> transport
@@ -47,7 +47,7 @@ export class AIAgentMCPServer {
     // Tool registry for AI decision making
     this.toolRegistry = new Map();
 
-    // Register all tools   this.toolRegistry.d.set
+    // Register all tools   
     this.registerTools();
   }
 
@@ -132,12 +132,12 @@ export class AIAgentMCPServer {
   }
   
 
-  // d chat history for context
+  // chat history for context
   getChatHistory(sessionId, limit = 10) {
     const session = this.initializeSession(sessionId);
     console.log(session.chatHistory);
     if (!session || !session.chatHistory) return [];
-    return session.chatHistory  ///sabse pehle mcp server post request aayi hai
+    return session.chatHistory  
   }
   registerTools() {
     // ----------------------------------------------------------------------
@@ -157,7 +157,6 @@ export class AIAgentMCPServer {
       },
       handler: async ({ fileBase64, fileType, sessionId }) => {
         console.log("🔍 Extracting text from file...");
-        // console.log(`File type: ${fileType}, Session ID: ${sessionId}`);
         let extractedText = "";
         extractedText = await extractText(fileBase64, fileType);
         console.log("aagaya djfjjffndkkf dji f ",extractedText);
@@ -167,11 +166,10 @@ export class AIAgentMCPServer {
         
         
 
-        // const prompt = `Based on the following json object:\n\n${userDetails}\n\nRead the the json and convert into single paragraph`;
         const prompt = `Convert the following given JSON data into a single-line paragraph in natural English:${JSON.stringify(
           userDetails,
           null,
-          2  // 5
+          2 
         )}
         Format for aadhar 
         "[Full Name], son of [Father Name], residing at [Address], was born on [DOB]. Aadhaar Number: [Number]. Gender: [Gender]."`;
@@ -207,7 +205,7 @@ export class AIAgentMCPServer {
         question: z.string().describe("Question about uploaded document"),
         sessionId: z.string().describe("Session ID with uploaded documents"),
       },
-      // handler: async ({ question, sessionId }) => {
+
       handler: async (question, sessionId) => {
         console.log("question : ", question, "sessionId : ", sessionId);
         const session = this.sessionData[sessionId];
@@ -225,10 +223,8 @@ export class AIAgentMCPServer {
 
         let rawText="";
         for (const file of session.uploadedFiles) {
-            // console.log("📑 Summary:", file.finalText);
             rawText+=file.finalText;
-
-        }
+          }
 
         const history = this.getChatHistory(sessionId, 5);
 
@@ -241,16 +237,16 @@ export class AIAgentMCPServer {
         console.log("file data is ", fileText);
         console.log("context from chat history",context,"finish");
 
-        // const prompt = `Based on the following document content:\n\n${rawText}\n\nAnswer the question:\n${question}`;
+        
         const prompt = `
         You are an AI assistant that answers user questions using both chat history and uploaded document data. 
 
         ### Guidelines:
         - Always analyze the **latest user message** in the context of the previous conversation and uploaded documents.
-        - If the user’s message refers to something from the past (e.g., "explain that again", "what about the first point?"), use the chat history (\n${context}\n) to infer meaning.
-        - If the user’s message refers to content inside uploaded documents, extract and ground your answer from the provided file text.
+        - If the user's message refers to something from the past (e.g., "explain that again", "what about the first point?"), use the chat history (\n${context}\n) to infer meaning.
+        - If the user's message refers to content inside uploaded documents, extract and ground your answer from the provided file text.
         - If both apply, combine chat history and file data for the most accurate response.
-        - Be concise but professional. If the answer is in the file, cite it clearly; if it’s inferred from context, explain logically.
+        - Be concise but professional. If the answer is in the file, cite it clearly; if it's inferred from context, explain logically.
 
         ---
 
@@ -286,9 +282,6 @@ export class AIAgentMCPServer {
       },
     });
 
-    // Chat system tool - Main entry point for conversations  sabse pehle mcp server post request aayi hai
-   
-
     this.registerTool({
   name: "runPredefinedChecks",
   description: "Run predefined checks on previously uploaded document text",
@@ -315,10 +308,6 @@ export class AIAgentMCPServer {
     for (const file of session.uploadedFiles) {
       rawText += file.finalText + "\n";
     }
-
-
-
-    
 
     // Predefined questions
     const predefinedQueries = [
@@ -364,8 +353,6 @@ export class AIAgentMCPServer {
           .describe("Session ID for maintaining chat history"),
       },
       handler: async ({ message, sessionId }) => {
-        console.log("hellonnsdnd");
-        
         return await this.handleChatMessage(message, sessionId);
       },
     });
@@ -382,9 +369,6 @@ export class AIAgentMCPServer {
           .describe("Number of recent messages to retrieve (default: 10)"),
       },
       handler: async ({ meassage=null ,sessionId=null,}) => {
-        // console.log("calling chat history tools .....")
-        // const history = this.getChatHistory(sessionId, 5);
-        // console.log("history ", history);
         const session = this.initializeSession(this.sessionId);
         const history=session.chatHistory;
         console.log("chat history in handler function",session.chatHistory);
@@ -468,12 +452,12 @@ export class AIAgentMCPServer {
     console.log("file data is ", fileText);
 
 
-    console.log("context from chat history",context,"finish");
+    console.log("context from chat history",context);
  
 
     // 🔍 List tool descriptions to inform LLM about capabilities   Chat message object:
     const availableTools = Array.from(this.toolRegistry.values())
-      .filter((t) => t.name !== "chat") // exclude core loop tool  d
+      .filter((t) => t.name !== "chat")
       .map((t) => ({
         name: t.name,
         description: t.description,
@@ -570,16 +554,10 @@ User Message:
         console.log("toolCall.args", toolCall);
 
         try {
-          
-          // if(toolCall.name=="getChatHistory"){
-          //   const result=await tool.handler(sessionId, 10 )
-          // }
-          // else {
             const result = await tool.handler(
               message,
               sessionId // inject sessionId if needed
             );
-          // }
           const textOut = result.content?.[0]?.text || "";
           finalText += textOut + "\n\n";
           toolCalls.push({
@@ -597,7 +575,7 @@ User Message:
         }
       }
     } else {
-      // Fallback: Just chat like a normal assistant    values
+      // Fallback: Just chat like a normal assistant 
       const chatPrompt = `You are a helpful assistant. Respond to: "${message}"`;
       const fallbackResp = await this.aiModel.generateContent(chatPrompt);
       finalText = fallbackResp.response.text().trim();
@@ -605,8 +583,6 @@ User Message:
 
     this.addToChatHistory(sessionId, "assistant", finalText, toolCalls);
 
-
-    console.log("pahele")
 
     return {
       content: [{ type: "text", text: finalText }],
@@ -627,7 +603,7 @@ User Message:
           description: value.description || `Parameter ${key}`,
         };
 
-        if (!value.isOptional()) {  // Assistant
+        if (!value.isOptional()) { 
           required.push(key);
         }
       }
@@ -659,21 +635,20 @@ User Message:
   }
 
   async handledGetRequest(req, res) {
-    console.log("d request received - Method not allowed for MCP");  // heidncncn
+    console.log("request received - Method not allowed for MCP");
     if (res.headersSent) return;
     res.status(405).set("Allow", "POST").send("Method Not Allowed");
   }
 
   async handlePostRequest(req, res) {
 
-    console.log("ayaya ree  handlePostRequest");
+    console.log("handle PostRequest");
     
-    console.log("heidncncn");  //handlePostRequest
-    console.log("fjfnf ---- kjjj");
-    console.log("paheli req.body",req.body);
+
+    console.log("first req.body ",req.body);
     
     
-    console.log("sabse pehle mcp server post request aayi hai");
+    console.log("first mcp server post request");
     const sessionId = req.headers["mcp-session-id"];
     console.log("POST request received, Session ID:", sessionId);
     this.sessionId=sessionId;
@@ -718,19 +693,16 @@ User Message:
           sessionIdGenerator: () => randomUUID(),
         });
         console.log("hu");
-        // console.log(transport);
         
-
         await this.server.connect(transport);
-        await transport.handleRequest(req, res, req.body);  //📝 Initialized session data for
-        // console.log(transport);
-
+        await transport.handleRequest(req, res, req.body);
+  
 
         const newSessionId = transport.sessionId;
 
         if (newSessionId) {
           this.transports[newSessionId] = transport;
-          this.initializeSession(newSessionId); // Initialize session data
+          this.initializeSession(newSessionId); 
           console.log("New transport created for session:", newSessionId);
         }
 
@@ -774,7 +746,7 @@ User Message:
         const result = InitializeRequestSchema.safeParse(data);
         return result.success;
       } catch (error) {
-        console.error("Error parsing initialize request:", error);   //❌ Error calling tool
+        console.error("Error parsing initialize request:", error);
         return false;
       }
     };
