@@ -162,7 +162,7 @@ export class AIAgentMCPServer {
         console.log("aagaya djfjjffndkkf dji f ",extractedText);
         
         const userDetails = await extractUserDetails(extractedText);
-        console.log("ye hi dekhana hia " ,userDetails);
+        console.log("User Details in json formate " ,userDetails);
         
         
 
@@ -182,8 +182,7 @@ export class AIAgentMCPServer {
 
         // Save text to session
         const sid = sessionId || randomUUID();
-        const session = this.initializeSession(sid);
-
+        
         return {
           content: [
             {
@@ -274,7 +273,7 @@ export class AIAgentMCPServer {
         return {
           content: [
             {
-              type: "text",
+              type: "text",  // extractUserDetails
               text: response.response.text().trim(),
             },
           ],
@@ -308,6 +307,8 @@ export class AIAgentMCPServer {
     for (const file of session.uploadedFiles) {
       rawText += file.finalText + "\n";
     }
+    console.log("our uploaded files",session.uploadedFiles);
+    
 
     // Predefined questions
     const predefinedQueries = [

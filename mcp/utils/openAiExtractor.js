@@ -180,6 +180,8 @@ export async function extractUserDetails(text) {
         throw new Error("Gemini response could not be parsed as JSON");
       }
     }
+    console.log(extracted , "line number 184");
+
 
     return {
       document_type: documentType,
