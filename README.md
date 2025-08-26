@@ -15,26 +15,64 @@ AI-powered Model Context Protocol server for intelligent document processing and
 - Node.js (v16+)
 - Google Gemini API key
 
-## Installation
 
-1. **Install dependencies**
-   ```bash
-   npm install
+🚀 Setup Guide
+
+Follow the steps below to run the Express Client and MCP Server.
+
+1️⃣ Clone the Repository
+
+ ```env
+git clone <your-repo-url>
    ```
 
-2. **Environment Setup**
+
+2️⃣ Setup Express Client
+
+ ```env
+cd Express-client
+   ```
+
+
+Install Dependencies
+
+
+ ```env
+npm install cors express multer
+   ```
+
+
+Start Express Client
+
+ ```env
+node client.js
+   ```
+
+
+3️⃣ Setup MCP Server
+
+ ```env
+cd ../mcp
+   ```
+
+
+Install Dependencies
+
+ ```env
+npm install @google/generative-ai @modelcontextprotocol/sdk dotenv express pdf-parse sharp tesseract.js zod
+   ```
+
+
+Start MCP Server
+ ```env
+node index.js
+   ```
+
+**Environment Setup**
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
-3. **Start servers**
-   ```bash
-   # Terminal 1 - MCP Server (port 3000)
-   node index.js
-   
-   # Terminal 2 - Client API (port 4000)  
-   node client.js
-   ```
 
 ## API Endpoints
 
