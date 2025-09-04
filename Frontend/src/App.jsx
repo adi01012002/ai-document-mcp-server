@@ -191,8 +191,8 @@ import ChatMessage from './components/ChatMessage'
 import FileUpload from './components/FileUpload'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
-const END_URL = 'http://localhost:4000';
-// const END_URL = 'http://172.16.52.58:4000';
+// const END_URL = 'http://localhost:4000';
+const END_URL = 'https://ai-document-mcp-server-1.onrender.com';
 
 function App() {
   const { theme, toggleTheme } = useTheme()
