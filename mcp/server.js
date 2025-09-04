@@ -322,7 +322,7 @@ export class AIAgentMCPServer {
     // Run checks and store results
     let results = {};
     for (const query of predefinedQueries) {
-      const prompt = `Document content:\n${rawText}\n\nTask: ${query}\nAnswer clearly:`;
+      const prompt = `Document content:\n${rawText}\n\nTask: ${query}\nAnswer clearly: in consize way no extra things explain only main points`;
       const response = await this.aiModel.generateContent(prompt);
       results[query] = response.response.text().trim();
     }

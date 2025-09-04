@@ -191,6 +191,8 @@ import ChatMessage from './components/ChatMessage'
 import FileUpload from './components/FileUpload'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
+const END_URL = 'http://localhost:4000';
+// const END_URL = 'http://172.16.52.58:4000';
 
 function App() {
   const { theme, toggleTheme } = useTheme()
@@ -230,7 +232,7 @@ function App() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:4000/chat', {
+      const res = await axios.post(`${END_URL}/chat`, {
         message: userMessage,
         sessionId,
       });
@@ -275,7 +277,7 @@ function App() {
     formData.append('sessionId', sessionId);
   
     try {
-      const res = await axios.post('http://localhost:4000/upload', formData, {
+      const res = await axios.post(`${END_URL}/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -316,28 +318,6 @@ function App() {
       </div>
       
       <div className="chat-messages">
-        {/* {messages.map((message, idx) => (
-          <div key={idx}>
-            {typeof message.content === 'string' ? (
-              <ChatMessage message={message} />
-            ) : message.content?.type === 'userData' ? (
-              <div className="chat-message bot">
-                <div className="user-data-card">
-                  <h3>📌 Extracted User Details</h3>
-                  <ul>
-                    <li><strong>Full Name:</strong> {message.content.data.full_name}</li>
-                    <li><strong>Date of Birth:</strong> {message.content.data.dob}</li>
-                    <li><strong>Father's Name:</strong> {message.content.data.father_name}</li>
-                    <li><strong>Gender:</strong> {message.content.data.gender}</li>
-                    <li><strong>Aadhaar Number:</strong> {message.content.data.aadhaar_number}</li>
-                    <li><strong>Address:</strong> {message.content.data.address}</li>
-                  </ul>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ))} */}
-
         {messages.map((message, idx) => (
   <div key={idx}>
     {typeof message.content === 'string' ? (

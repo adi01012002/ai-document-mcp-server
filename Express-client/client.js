@@ -265,7 +265,8 @@ async function main() {
     app.use(cors());
     app.use("/",router);
   try {
-      await client.connectToServer("http://localhost:3000/mcp");
+      await client.connectToServer("https://ai-document-mcp-server.onrender.com/mcp");
+      // await client.connectToServer("http://172.16.52.58:3000/mcp");
 
       app.listen(4000,()=>{
       console.log("Client app listening at http://localhost:4000");
