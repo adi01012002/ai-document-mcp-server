@@ -123,8 +123,6 @@ export class AIAgentMCPClient {
   }
 
   async callTool(toolName, args = {}) {
-    console.log(toolName , args);
-    
     try {
       if (!this.connected) {
         throw new Error("AI Agent MCP Client not connected");
@@ -137,17 +135,15 @@ export class AIAgentMCPClient {
             .map((t) => t.name)
             .join(", ")}`
         );
-      } 
-      // getTool
-      console.log(`⚙️ Calling tool: ${toolName}`);
-      if (toolName !== "chat" && Object.keys(args).length > 0) { 
-        console.log(`   Arguments:`, args);
       }
+
+      console.log(`⚙️ Calling tool: ${toolName}`);
 
       const start = Date.now();
 
+      // Increase timeout to 2 minutes for AI operations
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Tool call timeout")), 60000);
+        setTimeout(() => reject(new Error(`Tool '${toolName}' timeout after 2 minutes`)), 120000);
       });
 
       const callPromise = this.client.callTool({
@@ -158,7 +154,7 @@ export class AIAgentMCPClient {
       const result = await Promise.race([callPromise, timeoutPromise]);
       const duration = Date.now() - start;
 
-      console.log(`✅ Tool '${toolName}' executed in ${duration}ms`);
+      console.log(`✅ Tool '${toolName}' executed in ${(duration / 1000).toFixed(2)}s`);
 
       return {
         success: true,
@@ -266,7 +262,7 @@ async function main() {
     app.use("/",router);
   try {
       await client.connectToServer("https://ai-document-mcp-server.onrender.com/mcp");
-      // await client.connectToServer("http://172.16.52.58:3000/mcp");
+      // await client.connectToServer("http://localhost:3000/mcp");
 
       app.listen(4000,()=>{
       console.log("Client app listening at http://localhost:4000");

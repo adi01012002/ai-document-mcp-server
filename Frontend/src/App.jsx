@@ -184,7 +184,7 @@
 
 
 
-import React, { useState, useEffect} from 'react';
+import { useState, useEffect} from 'react';
 import { useTheme } from './hooks/useTheme'
 import axios from 'axios';
 import ChatMessage from './components/ChatMessage'
@@ -204,7 +204,6 @@ function App() {
   const [sessionId, setSessionId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [userData, setUserData] = useState(null);
 
   // Generate and persist sessionId
   useEffect(() => {
@@ -229,47 +228,63 @@ function App() {
     setInputText('');
     addMessage('user', userMessage);
     setIsLoading(true);
+    setIsTyping(true);
     setError('');
 
     try {
       const res = await axios.post(`${END_URL}/chat`, {
         message: userMessage,
         sessionId,
+      }, {
+        timeout: 120000, // 2 minutes timeout for AI processing
       });
 
-
       let botResponse = res.data.response;
-      console.log("in line 240",botResponse);
-      
 
-    // If response is JSON-like string, try parsing
-    try {
-      const parsed = JSON.parse(botResponse);
-      console.log("converting");
-      console.log("in line 242",parsed);
-      // Format JSON into clean string (key: value pairs)
-      botResponse = Object.entries(parsed)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("\n\n");
-    } catch (e) {
-      // not JSON, keep as plain text
-    }
-    console.log("in line 254",botResponse);
+      // If response is JSON-like string, try parsing
+      try {
+        const parsed = JSON.parse(botResponse);
+        // Format JSON into clean string (key: value pairs)
+        botResponse = Object.entries(parsed)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("\n\n");
+      } catch (e) {
+        // not JSON, keep as plain text
+      }
 
-    addMessage('assistant', botResponse);
+      addMessage('assistant', botResponse);
     } catch (error) {
-      setError('Failed to send message. Please try again.');
-      addMessage('assistant', '❌ Error occurred while fetching response.');
+      console.error('Chat error:', error);
+      const errorMsg = error.code === 'ECONNABORTED' 
+        ? '⏱️ Request timed out. The server is taking too long to respond. Please try again.'
+        : error.response?.data?.error 
+        ? `❌ ${error.response.data.error}`
+        : '❌ Failed to send message. Please check your connection and try again.';
+      
+      setError(errorMsg);
+      addMessage('assistant', errorMsg);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
   const handleFileUpload = async (file) => {
     if (!file) return;
   
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      const errorMsg = '❌ File too large. Maximum size is 10MB.';
+      setError(errorMsg);
+      addMessage('assistant', errorMsg);
+      return;
+    }
+
     addMessage('user', `📄 Uploaded file: ${file.name}`);
+    addMessage('assistant', '⏳ Processing your document... This may take 30-60 seconds for OCR and AI extraction.');
     setIsLoading(true);
+    setIsTyping(true);
     setError('');
   
     const formData = new FormData();
@@ -281,28 +296,42 @@ function App() {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 180000, // 3 minutes timeout for file processing (OCR can be slow)
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`Upload progress: ${percentCompleted}%`);
+        }
       });
 
-      const extractedData = res.data.content[0].data.extracted_fields;
-      console.log(extractedData);
+      const extractedData = res.data.content[0]?.data?.extracted_fields;
       
-      setUserData(extractedData);
+      if (!extractedData) {
+        throw new Error('No data extracted from document');
+      }
 
-      // Instead of a separate card, push extracted object into chat messages
+      // Push extracted object into chat messages
       addMessage('assistant', {
         type: 'userData',
         data: extractedData
       });
 
     } catch (err) {
-      setError('Failed to upload file. Please try again.');
-      addMessage('assistant', '❌ Failed to upload file.');
+      console.error('Upload error:', err);
+      const errorMsg = err.code === 'ECONNABORTED'
+        ? '⏱️ Upload timed out. Large files or slow OCR processing can take time. Please try again or use a smaller file.'
+        : err.response?.data?.error
+        ? `❌ ${err.response.data.error}`
+        : '❌ Failed to upload file. Please check the file format and try again.';
+      
+      setError(errorMsg);
+      addMessage('assistant', errorMsg);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
@@ -318,6 +347,19 @@ function App() {
       </div>
       
       <div className="chat-messages">
+        {error && (
+          <div className="error-banner" style={{
+            padding: '10px',
+            margin: '10px',
+            backgroundColor: '#fee',
+            border: '1px solid #fcc',
+            borderRadius: '5px',
+            color: '#c00'
+          }}>
+            {error}
+          </div>
+        )}
+        
         {messages.map((message, idx) => (
   <div key={idx}>
     {typeof message.content === 'string' ? (
@@ -355,17 +397,18 @@ function App() {
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Type your message..."
             className="message-input"
             rows="1"
+            disabled={isLoading}
           />
           <button 
             onClick={handleSendMessage}
             className="send-button"
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() || isLoading}
           >
-            Send
+            {isLoading ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>

@@ -25,7 +25,7 @@ const router = express.Router();
 // endpoint for the client to use for sending messages
 const MCP_ENDPOINT = "/mcp"
 
-// MCP endpoint handlers
+// MCP endpoint handlers 000
 router.post(MCP_ENDPOINT, async (req, res) => {
   console.log("mcp end point ");  
   try {
